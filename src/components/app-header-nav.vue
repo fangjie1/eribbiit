@@ -5,7 +5,7 @@
     </li>
     <li v-for="item in list"
         :key="item.id"
-        @mouseenter="show(item)"
+        @mousemove="show(item)"
         @mouseleave="hide(item)">
       <router-link :to="`/category/${item.id}`"
                    @click="hide(item)">{{item.name}}</router-link>
