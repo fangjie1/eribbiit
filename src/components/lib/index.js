@@ -7,7 +7,6 @@
 // 参数：1. 目录  2. 是否加载子目录  3. 加载的正则匹配
 import defaultImg from '@/assets/images/200.png'
 const importFn = require.context('./', false, /\.vue$/)
-
 // console.dir(importFn.keys()) 文件名称数组
 export default {
   install (app) {
