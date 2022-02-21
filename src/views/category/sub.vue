@@ -1,7 +1,6 @@
 <template>
   <diva class='sub-category'>
     <div class="container">
-      <span>{{g}}</span>
       <!-- 面包屑 -->
       <SubBread />
       <!-- 筛选区 -->

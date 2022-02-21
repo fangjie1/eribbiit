@@ -6,8 +6,8 @@ import router from '@/router'
 export const baseURL = 'http://pcapi-xiaotuxian-front.itheima.net'
 const instance = axios.create({
   // axios 的一些配置，baseURL  timeout
-  baseURL,
-  timeout: 10000
+  baseURL
+
 })
 instance.interceptors.request.use(config => {
   const { profile } = store.state.user
