@@ -10,15 +10,19 @@
     </div>
     <div class="option"
          v-if="visible">
+      <div v-if="loading"
+           class="loading"></div>
       <span class="ellipsis"
-            v-for="i in 24"
-            :key="i">北京市</span>
+            v-for="item in currList"
+            :key="item.code"
+            v-else>{{item.name}}</span>
     </div>
   </div>
 </template>
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onClickOutside } from '@vueuse/core'
+import axios from 'axios'
 export default {
   name: 'XtxCity',
   setup () {
@@ -26,6 +30,12 @@ export default {
     const visible = ref(false)
     const open = () => {
       visible.value = true
+      // 获取地区数据
+      loading.value = true
+      getCityData().then(data => {
+        allCityData.value = data
+        loading.value = false
+      })
     }
     const close = () => {
       visible.value = false
@@ -37,27 +47,31 @@ export default {
     onClickOutside(target, () => {
       close()
     })
+    const allCityData = ref([])
+    const loading = ref(false)
     // 获取城市数据
-    // 1. 数据在哪里？https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/area.json
-    // 2. 何时获取？打开城市列表的时候，做个内存中缓存
-    // 3. 怎么使用数据？定义计算属性，根据点击的省份城市展示
-    // const getCityData = () => {
-    //   // 这个位置可能有异常操作，封装成promise
-    //   return new Promise((resolve, reject) => {
-    //     if (window.cityData) {
-    //       // 有缓存
-    //       resolve(window.cityData)
-    //     } else {
-    //       // 无缓存
-    //       const url = 'https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/area.json'
-    //       axios.get(url).then(res => {
-    //         window.cityData = res.data
-    //         resolve(window.cityData)
-    //       })
-    //     }
-    //   })
-    // }
-    return { visible, toggleDialog, target }
+    const getCityData = () => {
+      // 这个位置可能有异常操作，封装成promise
+      return new Promise((resolve, reject) => {
+        if (window.cityData) {
+          // 有缓存
+          resolve(window.cityData)
+        } else {
+          // 无缓存
+          const url = 'https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/area.json'
+          axios.get(url).then(res => {
+            window.cityData = res.data
+            resolve(window.cityData)
+          })
+        }
+      })
+    }
+    const currList = computed(() => {
+      // 默认省一级
+      const list = allCityData.value
+      return list
+    })
+    return { visible, toggleDialog, target, loading, currList }
   }
 }
 </script>
@@ -109,6 +123,11 @@ export default {
       &:hover {
         background: #f5f5f5;
       }
+    }
+    .loading {
+      height: 290px;
+      width: 100%;
+      background: url(../../assets/images/loading.gif) no-repeat center;
     }
   }
 }
