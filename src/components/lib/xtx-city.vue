@@ -4,15 +4,18 @@
     <div class="select"
          @click="toggleDialog"
          :class="{active:visible}">
-      <span class="placeholder">请选择配送地址</span>
-      <span class="value"></span>
+      <span class="placeholder"
+            v-if="!fullLocation">请选择配送地址</span>
+      <span class="value"
+            v-else>{{fullLocation}}</span>
       <i class="iconfont icon-angle-down"></i>
     </div>
     <div class="option"
          v-if="visible">
       <div v-if="loading"
            class="loading"></div>
-      <span class="ellipsis"
+      <span @click="changeItem(item)"
+            class="ellipsis"
             v-for="item in currList"
             :key="item.code"
             v-else>{{item.name}}</span>
@@ -20,12 +23,18 @@
   </div>
 </template>
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 import axios from 'axios'
 export default {
   name: 'XtxCity',
-  setup () {
+  props: {
+    fullLocation: {
+      type: String,
+      default: ''
+    }
+  },
+  setup (props, { emit }) {
     // 控制展开收起,默认收起
     const visible = ref(false)
     const open = () => {
@@ -36,6 +45,9 @@ export default {
         allCityData.value = data
         loading.value = false
       })
+      for (const key in changeResult) {
+        changeResult[key] = ''
+      }
     }
     const close = () => {
       visible.value = false
@@ -47,11 +59,11 @@ export default {
     onClickOutside(target, () => {
       close()
     })
+
     const allCityData = ref([])
     const loading = ref(false)
-    // 获取城市数据
+    // 获取城市数据功能
     const getCityData = () => {
-      // 这个位置可能有异常操作，封装成promise
       return new Promise((resolve, reject) => {
         if (window.cityData) {
           // 有缓存
@@ -68,10 +80,48 @@ export default {
     }
     const currList = computed(() => {
       // 默认省一级
-      const list = allCityData.value
+      let list = allCityData.value
+      console.log(list)
+      // 市一级
+      if (changeResult.provinceCode && changeResult.provinceName) {
+        list = list.find(p => p.code === changeResult.provinceCode).areaList
+      }
+      // 区一级
+      if (changeResult.cityCode && changeResult.cityName) {
+        list = list.find(p => p.code === changeResult.cityCode).areaList
+      }
       return list
     })
-    return { visible, toggleDialog, target, loading, currList }
+    const changeResult = reactive({
+      provinceCode: '',
+      provinceName: '',
+      cityCode: '',
+      cityName: '',
+      countyCode: '',
+      countyName: '',
+      fullLocation: ''
+    })
+    const changeItem = (item) => {
+      // 省份
+      if (item.level === 0) {
+        changeResult.provinceCode = item.code
+        changeResult.provinceName = item.name
+      }
+      // 市
+      if (item.level === 1) {
+        changeResult.cityCode = item.code
+        changeResult.cityName = item.name
+      }
+      // 地区
+      if (item.level === 2) {
+        changeResult.countyCode = item.code
+        changeResult.countyName = item.name
+        close()
+        changeResult.fullLocation = `${changeResult.provinceName} ${changeResult.cityName} ${changeResult.countyName}`
+        emit('change', changeResult)
+      }
+    }
+    return { visible, toggleDialog, target, loading, currList, changeItem }
   }
 }
 </script>
