@@ -1,14 +1,26 @@
 <template>
   <div class="goods-comment-image">
     <div class="list">
-      <a href="javascript:;">
+      <a href="javascript:;"
+         :class="{active:currImage===url}"
+         @click="currImage=url"
+         v-for="url in pictures"
+         :key="url">
         <img :src="url"
              alt="">
       </a>
     </div>
-    <div class="preview"></div>
+
+    <div class="preview"
+         v-if="currImage">
+      <img :src="currImage"
+           alt="">
+      <i @click="currImage=null"
+         class="iconfont icon-close-new"></i>
+    </div>
   </div>
 </template>
+
 <script>
 import { ref } from 'vue'
 export default {
