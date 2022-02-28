@@ -6,7 +6,7 @@
       <XtxBread>
         <XtxBreadItem to="/">首页</XtxBreadItem>
         <XtxBreadItem :to="`/category/sub/${goods.categories[1].id}`">{{goods.categories[1].name}}</XtxBreadItem>
-        <XtxBreadItem :to="`/category/sub/${goods.categories[0].id}'`">{{goods.categories[0].name}}</XtxBreadItem>
+        <XtxBreadItem :to="`/category/sub/${goods.categories[0].id}`">{{goods.categories[0].name}}</XtxBreadItem>
         <XtxBreadItem>{{goods.name}}</XtxBreadItem>
       </XtxBread>
       <!-- 商品信息 -->
@@ -17,7 +17,14 @@
         </div>
         <div class="spec">
           <GoodsName :goods="goods" />
-          <GoodsSku :goods="goods" />
+          <GoodsSku :goods="goods"
+                    skuId="1545000"
+                    @change="changeSku" />
+          <XtxNumbox v-model="num"
+                     label="数量" />
+          <XtxButton type="primary"
+                     size="large"
+                     style="margin-top:28px">加入购物车</XtxButton>
         </div>
       </div>
       <!-- 商品推荐 -->
@@ -51,7 +58,16 @@ export default {
   components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
   setup () {
     const goods = useGoods()
-    return { goods }
+    console.log(goods)
+    const changeSku = (sku) => {
+      if (sku.skuId) {
+        goods.value.price = sku.price
+        goods.value.oldPrice = sku.oldPrice
+        goods.value.inventory = sku.inventory
+      }
+    }
+    const num = ref(1)
+    return { goods, changeSku, num }
   }
 }
 // 获取商品详情

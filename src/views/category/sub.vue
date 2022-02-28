@@ -50,6 +50,7 @@ export default {
     const getData = () => {
       loading.value = true
       reqParams.categoryId = route.params.id
+      console.log(reqParams.categoryId)
       findSubCategoryGoods(reqParams).then(({ result }) => {
         if (result.items.length) {
           goodsList.value.push(...result.items)

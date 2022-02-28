@@ -65,7 +65,6 @@ const updateDisableStatus = (specs, pathMap) => {
       if (val.selected) return
       selectedValues[i] = val.name
       const key = selectedValues.filter(value => value).join(spliter)
-      console.log(key)
       val.disabled = !pathMap[key]
     })
   })
@@ -94,7 +93,7 @@ export default {
       default: ''
     }
   },
-  setup (props) {
+  setup (props, { emit }) {
     const pathMap = getPathMap(props.goods.skus)
     // 根据传入的skuId默认选中规格按钮
     initSelectedStatus(props.goods, props.skuId)
@@ -110,6 +109,22 @@ export default {
         val.selected = true
       }
       updateDisableStatus(props.goods.specs, pathMap)
+      // 将选择的sku信息通知父组件
+      // 得到有效的数组
+      const selectedArr = getSelectedValues(props.goods.specs).filter(v => v)
+      if (selectedArr.length === props.goods.specs.length) {
+        const skuIds = pathMap[selectedArr.join(spliter)]
+        const sku = props.goods.skus.find(sku => sku.id === skuIds[0])
+        emit('change', {
+          skuId: sku.id,
+          price: sku.price,
+          oldPrice: sku.oldPrice,
+          inventory: sku.inventory,
+          specsText: sku.specs.reduce((p, n) => `${p} ${n.name}: ${n.valueName}`, '').replace(' ', '')
+        })
+      } else {
+        emit('change', {})
+      }
     }
     return { clickSpecs }
   }
