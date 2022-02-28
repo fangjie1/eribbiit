@@ -5,13 +5,27 @@
       <span class="title">{{goodsId?'同类商品推荐':'猜你喜欢'}}</span>
     </div>
     <!-- 此处使用改造后的xtx-carousel.vue -->
-    <XtxCarousel :sliders="sliders" />
+    <XtxCarousel v-if="sliders"
+                 :sliders="sliders" />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import { findRelevantGoods } from '@/api/product'
+import { findRelevantGoods, findRelGoods } from '@/api/product'
+// 得到需要的数据
+const useRelGoodsData = (id) => {
+  const sliders = ref([])
+  findRelGoods(id).then(data => {
+    // 每页4条
+    const size = 4
+    const total = Math.ceil(data.result.length / size)
+    for (let i = 0; i < total; i++) {
+      sliders.value.push(data.result.slice(i * size, (i + 1) * size))
+    }
+  })
+  return sliders
+}
 export default {
   // 同类推荐，猜你喜欢
   name: 'GoodsRelevant',
@@ -22,7 +36,7 @@ export default {
     }
   },
   setup (props) {
-    const sliders = ref([])
+    let sliders = ref([])
     findRelevantGoods(props.goodsId).then(data => {
       const pageSize = 4
       const pageCount = Math.ceil(data.result.length / pageSize)
@@ -31,11 +45,12 @@ export default {
       }
       console.log(sliders.value)
     })
+    sliders = useRelGoodsData(props.goodsId)
     return { sliders }
   }
 }
-</script>
 
+</script>
 <style scoped lang='less'>
 .goods-relevant {
   background: #fff;
@@ -69,25 +84,25 @@ export default {
       }
     }
   }
-  :deep(.xtx-carousel) {
-    height: 380px;
-    .carousel {
-      &-indicator {
-        bottom: 30px;
-        span {
-          &.active {
-            background: @xtxColor;
-          }
+}
+:deep(.xtx-carousel) {
+  height: 380px;
+  .carousel {
+    &-indicator {
+      bottom: 30px;
+      span {
+        &.active {
+          background: @xtxColor;
         }
       }
-      &-btn {
-        top: 110px;
-        opacity: 1;
-        background: rgba(0, 0, 0, 0);
-        color: #ddd;
-        i {
-          font-size: 30px;
-        }
+    }
+    &-btn {
+      top: 110px;
+      opacity: 1;
+      background: rgba(0, 0, 0, 0);
+      color: #ddd;
+      i {
+        font-size: 30px;
       }
     }
   }

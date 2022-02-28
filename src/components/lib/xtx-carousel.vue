@@ -66,7 +66,7 @@ export default {
   },
   setup (props) {
     // 控制显示图片的索引
-    const index = ref(4)
+    const index = ref(0)
 
     // 自动播放轮播图
     let timer = null
@@ -199,6 +199,7 @@ export default {
     display: flex;
     justify-content: space-around;
     padding: 0 40px;
+    z-index: 100000;
     > a {
       width: 240px;
       text-align: center;
