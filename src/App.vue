@@ -1,4 +1,6 @@
 <template>
+  <XtxMessage type="error"
+              text="用户名不存在" />
   <RouterView />
 </template>
 

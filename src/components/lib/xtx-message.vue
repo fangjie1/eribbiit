@@ -1,8 +1,8 @@
 <template>
   <Transition name="down">
-    <div class='xtx-message'
-         :style="style"
-         v-show="show">
+    <div class="xtx-message"
+         v-show="visible"
+         :style="style[type]">
       <!-- 上面绑定的是样式 -->
       <!-- 不同提示图标会变 -->
       <i class="iconfont"
@@ -11,20 +11,18 @@
     </div>
   </Transition>
 </template>
-
 <script>
-import { onMounted, ref } from 'vue'
+import { ref, OnMounted } from 'vue'
 export default {
   name: 'XtxMessage',
   props: {
+    type: {
+      type: String,
+      default: 'warn'
+    },
     text: {
       type: String,
       default: ''
-    },
-    type: {
-      type: String,
-      // warn 警告  error 错误  success 成功
-      default: 'warn'
     }
   },
   setup () {
@@ -49,16 +47,15 @@ export default {
         borderColor: 'rgb(225, 243, 216)'
       }
     }
-    // 定义一个数据控制显示隐藏，默认是隐藏，组件挂载完毕显示
     const visible = ref(false)
-    onMounted(() => {
+    OnMounted(() => {
       visible.value = true
     })
     return { style, visible }
   }
 }
 </script>
-<style scope lang="less">
+<style scoped lang="less">
 .down {
   &-enter {
     &-from {
@@ -72,6 +69,28 @@ export default {
       transform: none;
       opacity: 1;
     }
+  }
+}
+.xtx-message {
+  width: 300px;
+  height: 50px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  margin-left: -150px;
+  top: 25px;
+  line-height: 50px;
+  padding: 0 25px;
+  border: 1px solid #e4e4e4;
+  background: #f5f5f5;
+  color: #999;
+  border-radius: 4px;
+  i {
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .text {
+    vertical-align: middle;
   }
 }
 </style>
