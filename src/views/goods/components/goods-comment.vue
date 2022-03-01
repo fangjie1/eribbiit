@@ -20,7 +20,9 @@
         </div>
       </div>
     </div>
-    <div class="sort">
+    <!-- 排序 -->
+    <div class="sort"
+         v-if="commentInfo">
       <span>排序：</span>
       <a href="javascript:;"
          :class="{active:reqParams.sortField===null}"
@@ -32,7 +34,7 @@
          :class="{active:reqParams.sortField==='praiseCount'}"
          @click="changeSort('praiseCount')">最热</a>
     </div>
-    <!-- 列表 -->
+    <!-- 评论列表 -->
     <div class="list"
          v-if="commentList">
       <div class="item"
@@ -54,6 +56,7 @@
             <span class="attr">{{formatSpecs(item.orderInfo.specs)}}</span>
           </div>
           <div class="text">{{item.content}}</div>
+          <!-- 评论图片组件 -->
           <GoodsCommentImage v-if="item.pictures.length"
                              :pictures="item.pictures" />
           <div class="time">
@@ -63,6 +66,11 @@
         </div>
       </div>
     </div>
+    <XtxPagination v-if="total"
+                   :total="total"
+                   :pageSize="reqParams.pageSize"
+                   :currentPage="reqParams.page"
+                   @current-page="changePagerFn" />
   </div>
 </template>
 <script>
@@ -106,18 +114,20 @@ export default {
     // 筛选条件准备
     const reqParams = reactive({
       page: 1,
-      pageSize: 10,
+      pageSize: 20,
       hasPicture: null,
       tag: null,
       sortField: null
     })
     const commentList = ref([])
+    // 列表数量
+    const total = ref(0)
     watch(reqParams, async () => {
       findGoodsCommentList(goods.value.id, reqParams).then(data => {
         commentList.value = data.result.items
+        total.value = data.result.counts
       })
     }, { immediate: true })
-    console.log(commentList)
     // 定义转换数据的函数（对应vue2.0的过滤器）
     const formatSpecs = (specs) => {
       return specs.reduce((p, c) => p + ` ${c.name}：${c.nameValue}`, '').trim()
@@ -125,7 +135,10 @@ export default {
     const formatNickname = (nickname) => {
       return nickname.substr(0, 1) + '****' + nickname.substr(-1)
     }
-    return { commentInfo, currTagIndex, changeTag, changeSort, reqParams, commentList, formatSpecs, formatNickname }
+    const changePagerFn = (newPage) => {
+      reqParams.page = newPage
+    }
+    return { commentInfo, currTagIndex, changeTag, changeSort, reqParams, commentList, formatSpecs, formatNickname, total, changePagerFn }
   }
 }
 </script>
