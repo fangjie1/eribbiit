@@ -1,6 +1,9 @@
 const path = require('path')
 module.exports = {
   chainWebpack: config => {
+    // 开启IP和域名访问权限。
+    config.devServer.disableHostCheck(true)
+    // 图片加载
     config.module
       .rule('images')
       .use('url-loader')
@@ -14,6 +17,11 @@ module.exports = {
         path.join(__dirname, './src/assets/styles/variables.less'),
         path.join(__dirname, './src/assets/styles/mixins.less')
       ]
+    }
+  },
+  configureWebpack: {
+    externals: {
+      qc: 'QC'
     }
   }
 }

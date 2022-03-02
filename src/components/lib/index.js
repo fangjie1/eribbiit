@@ -6,6 +6,7 @@
 // 批量导入需要使用一个函数 require.context(dir,deep,matching)
 // 参数：1. 目录  2. 是否加载子目录  3. 加载的正则匹配
 import defaultImg from '@/assets/images/200.png'
+import Message from './Message'
 const importFn = require.context('./', false, /\.vue$/)
 // console.dir(importFn.keys()) 文件名称数组
 export default {
@@ -18,6 +19,8 @@ export default {
       app.component(component.name, component)
     })
     defineDirective(app)
+    // 定义一个原型函数
+    app.config.globalProperties.$message = Message
   }
 }
 

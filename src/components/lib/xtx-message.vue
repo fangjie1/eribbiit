@@ -12,7 +12,7 @@
   </Transition>
 </template>
 <script>
-import { ref, OnMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 export default {
   name: 'XtxMessage',
   props: {
@@ -47,8 +47,9 @@ export default {
         borderColor: 'rgb(225, 243, 216)'
       }
     }
+    // 定义一个数据控制显示隐藏，默认是隐藏，组件挂载完毕显示
     const visible = ref(false)
-    OnMounted(() => {
+    onMounted(() => {
       visible.value = true
     })
     return { style, visible }
