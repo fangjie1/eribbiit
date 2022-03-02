@@ -22,7 +22,8 @@
                     @change="changeSku" />
           <XtxNumbox v-model="num"
                      label="数量" />
-          <XtxButton type="primary"
+          <XtxButton @click="insertCart()"
+                     type="primary"
                      size="large"
                      style="margin-top:28px">加入购物车</XtxButton>
         </div>
@@ -59,6 +60,8 @@ import GoodsSku from './components/goods-sku'
 import GoodsTabs from './components/goods-tabs'
 import GoodsHot from './components/goods-hot'
 import GoodsWarn from './components/goods-warn'
+import Message from '@/components/lib/Message'
+import { useStore } from 'vuex'
 export default {
   name: 'XtxGoodsPage',
   components: {
@@ -66,17 +69,46 @@ export default {
   },
   setup () {
     const goods = useGoods()
-    console.log(goods)
+
     const changeSku = (sku) => {
+      // 修改商品的现价原价库存信息
       if (sku.skuId) {
         goods.value.price = sku.price
         goods.value.oldPrice = sku.oldPrice
         goods.value.inventory = sku.inventory
       }
+      // 记录选择后的Sku,可能有数据，也可能没有
+      currSku.value = sku
     }
     const num = ref(1)
     provide('goods', goods)
-    return { goods, changeSku, num }
+    // 加入购物车
+    const store = useStore()
+    const currSku = ref(null)
+    const insertCart = () => {
+      if (currSku.value && currSku.value.skuId) {
+        const { skuId, specsText: attrsText, inventory: stock } = currSku.value
+        const { id, name, price, mainPictures } = goods.value
+        store.dispatch('cart/insertCart', {
+          skuId,
+          attrsText,
+          stock,
+          id,
+          name,
+          price,
+          nowPrice: price,
+          picture: mainPictures[0],
+          selected: true,
+          count: num.value,
+          isEffective: true
+        }).then(() => {
+          Message({ type: 'success', text: '加入购物车成功' })
+        })
+      } else {
+        Message({ text: '请选择完整规格' })
+      }
+    }
+    return { goods, changeSku, num, insertCart }
   }
 }
 // 获取商品详情
