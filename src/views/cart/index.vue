@@ -125,7 +125,7 @@
 <script>
 import GoodRelevant from '@/views/goods/components/goods-relevant'
 import { useStore } from 'vuex'
-import Message from ' @/components/lib/Message'
+import Message from '@/components/lib/Message'
 import CartNone from './components/cart-none.vue'
 export default {
   name: 'XtxCartPage',

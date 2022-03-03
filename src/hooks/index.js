@@ -5,6 +5,7 @@ import { ref } from 'vue'
  * @param {Element} target -Dom对象
  * @param {Function} apiFn -API函数
  */
+// 组件懒加载
 export const useLazyData = (apiFn) => {
   const target = ref(null)
   const result = ref([])
