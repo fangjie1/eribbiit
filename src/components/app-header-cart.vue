@@ -1,15 +1,16 @@
 <template>
   <div class="cart">
-    <a class="curr"
-       href="javascript:;">
+    <RouterLink class="curr"
+                to="/cart">
       <i class="iconfont icon-cart"></i><em>{{$store.getters['cart/validTotal']}}</em>
-    </a>
-    <div class="layer">
+    </RouterLink>
+    <div class="layer"
+         v-if="$store.getters['cart/validList'].length>0&&$route.path!=='/cart'">
       <div class="list">
         <div class="item"
              v-for="goods in $store.getters['cart/validList']"
              :key="goods.skuId">
-          <RouterLink to="">
+          <RouterLink :to="`/product/${goods.id}`">
             <img :src="goods.picture"
                  alt="">
             <div class="center">
@@ -21,7 +22,8 @@
               <p class="count">x{{goods.count}}</p>
             </div>
           </RouterLink>
-          <i class="iconfont icon-close-new"></i>
+          <i @click="deleteCart(goods.skuId)"
+             class="iconfont icon-close-new"></i>
         </div>
       </div>
       <div class="foot">
@@ -29,14 +31,27 @@
           <p>共 {{$store.getters['cart/validTotal']}} 件商品</p>
           <p>&yen;{{$store.getters['cart/validAmount']}}</p>
         </div>
-        <XtxButton type="plain">去购物车结算</XtxButton>
+        <XtxButton @click="$router.push('/cart')"
+                   type="plain">去购物车结算</XtxButton>
       </div>
     </div>
   </div>
 </template>
 <script>
+import { useStore } from 'vuex'
+import Message from './lib/Message'
 export default {
-  name: 'AppHeaderCart'
+  name: 'AppHeaderCart',
+  setup () {
+    const store = useStore()
+    store.dispatch('cart/findCartList').then(() => {
+      Message({ type: 'success', text: '更新购物车成功' })
+    })
+    const deleteCart = (skuId) => {
+      store.dispatch('cart/deleteCart', skuId)
+    }
+    return { deleteCart }
+  }
 }
 </script>
 <style scoped lang="less">
