@@ -1,7 +1,8 @@
 <template>
   <div class="xtx-confirm"
-       v-if="visible">
-    <div class="wrapper">
+       :class="{fade}">
+    <div class="wrapper"
+         :class="{fade}">
       <div class="header">
         <h3>{{title}}</h3>
         <a @click="cancel"
@@ -24,7 +25,9 @@
   </div>
 </template>
 <script>
+// 当前组件不是在APP下进行渲染，无法使用APP下的环境（全局组件，全局指令，原型属性函数）
 import { ref, onMounted } from 'vue'
+import XtxButton from '@/components/lib/xtx-button'
 export default {
   name: 'XtxConfirm',
   props: {
@@ -35,23 +38,33 @@ export default {
     text: {
       type: String,
       default: ''
+    },
+    submitCallback: {
+      type: Function
+    },
+    cancelCallback: {
+      type: Function
     }
   },
-  setup () {
+  components: { XtxButton },
+  setup (props) {
     // 对话框
-    const visible = ref(false)
+    const fade = ref(false)
+    // 当元素渲染完毕立即过渡的动画不会触发
     onMounted(() => {
-      visible.value = true
+      setTimeout(() => {
+        fade.value = true
+      }, 0)
     })
     // 关闭对话框
     const cancel = () => {
-      visible.value = false
+      props.cancelCallback()
     }
     // 确认
     const submit = () => {
-      visible.value = false
+      props.submitCallback()
     }
-    return { visible, cancel, submit }
+    return { cancel, submit, fade }
   }
 }
 </script>
@@ -63,7 +76,11 @@ export default {
   width: 100%;
   height: 100%;
   z-index: 8888;
-  background: rgba(0, 0, 0, 0.5);
+  transition: all 0.4s;
+  background: rgba(0, 0, 0, 0);
+  &.fade {
+    background: rgba(0, 0, 0, 0.5);
+  }
   .wrapper {
     width: 400px;
     background: #fff;
@@ -71,7 +88,13 @@ export default {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -60%);
+    transition: all 0.4s;
+    opacity: 0;
+    &.fade {
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
     .header,
     .footer {
       height: 50px;

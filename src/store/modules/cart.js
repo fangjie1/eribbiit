@@ -34,7 +34,6 @@ export default {
     },
     // 选中商品总金额
     selectedAmount (state, getters) {
-      console.log(getters.selectedList.reduce((p, c) => p + Math.round(c.nowPrice * 100 * c.count), 0) / 100)
       return getters.selectedList.reduce((p, c) => p + Math.round(c.nowPrice * 100 * c.count), 0) / 100
     },
     // 是否全选
@@ -139,6 +138,21 @@ export default {
         } else {
           // 未登录
           ctx.commit('deleteCart', skuId)
+          resolve()
+        }
+      })
+    },
+    // 批量删除选中商品或失效商品
+    batchDeleteCart (ctx, isClear) {
+      return new Promise((resolve, reject) => {
+        if (ctx.rootState.user.profile.token) {
+          // 登录
+        } else {
+          // 未登录
+          // isClear为真时删除失效商品,否则为删除选中商品
+          ctx.getters[isClear ? 'invalidList' : 'selectedList'].forEach(item => {
+            ctx.commit('deleteCart', item.skuId)
+          })
           resolve()
         }
       })
