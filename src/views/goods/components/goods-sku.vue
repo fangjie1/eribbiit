@@ -158,6 +158,10 @@ export default {
     }
     dd {
       display: flex;
+      flex-wrap: wrap;
+      div {
+        margin-top: 10px;
+      }
       flex: 1;
       color: #666;
       img {

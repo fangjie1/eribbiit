@@ -40,15 +40,20 @@
                   <div>
                     <p class="name ellipsis">{{goods.name}}</p>
                     <!-- 选择规格组件 -->
+                    <CartSku @change="$event=>updateCartSku(goods.skuId,$event)"
+                             :skuId="goods.skuId"
+                             :attrsText="goods.attrsText" />
                   </div>
                 </div>
               </td>
               <td class="tc">
                 <p>&yen;{{goods.nowPrice}}</p>
-                <p v-if="goods.price-goods.nowPrice>0">比加入时降价 <span class="red">{{goods.price-goods.nowPrice}} &yen;20.00</span></p>
+                <p v-if="goods.price-goods.nowPrice>0">比加入时降价 <span class="red">&yen;{{goods.price-goods.nowPrice}}</span></p>
               </td>
               <td class="tc">
-                <XtxNumbox :modelValue="goods.count" />
+                <XtxNumbox @change="$event=>updateCount(goods.skuId,$event)"
+                           :max="goods.stock"
+                           :modelValue="goods.count" />
               </td>
               <td class="tc">
                 <p class="f16 red">&yen;{{Math.round(goods.nowPrice*100)*goods.count/100}}</p>
@@ -102,7 +107,6 @@
         </table>
       </div>
       <!-- 操作栏 -->
-      <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
           <XtxCheckbox @change="checkAll"
@@ -130,9 +134,10 @@ import { useStore } from 'vuex'
 import Message from '@/components/lib/Message'
 import Confirm from '@/components/lib/Confirm'
 import CartNone from './components/cart-none.vue'
+import CartSku from './components/cart-sku'
 export default {
   name: 'XtxCartPage',
-  components: { GoodRelevant, CartNone },
+  components: { GoodRelevant, CartNone, CartSku },
   setup () {
     const store = useStore()
     // 单选
@@ -153,16 +158,24 @@ export default {
 
       })
     }
+    // 批量删除
     const batchDeleteCart = (isClear) => {
       Confirm({ text: `亲，您是否确认删除${isClear ? '失效' : '选中'}的商品` }).then(() => {
         store.dispatch('cart/batchDeleteCart', isClear).then(() => {
           Message({ type: 'success', text: '删除成功' })
         })
       }).catch((e) => {
-
       })
     }
-    return { checkOne, checkAll, deleteCart, batchDeleteCart }
+    // 修改数量
+    const updateCount = (skuId, count) => {
+      store.dispatch('cart/updateCart', { skuId, count })
+    }
+    // 修改规格
+    const updateCartSku = (oldSkuId, newSku) => {
+      store.dispatch('cart/updateCartSku', { oldSkuId, newSku })
+    }
+    return { checkOne, checkAll, deleteCart, batchDeleteCart, updateCount, updateCartSku }
   }
 }
 </script>

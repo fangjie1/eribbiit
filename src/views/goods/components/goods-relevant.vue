@@ -43,7 +43,6 @@ export default {
       for (let i = 0; i < pageCount; i++) {
         sliders.value.push(data.result.slice(pageSize * i, pageSize * (i + 1)))
       }
-      console.log(sliders.value)
     })
     sliders = useRelGoodsData(props.goodsId)
     return { sliders }

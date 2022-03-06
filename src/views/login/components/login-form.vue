@@ -168,10 +168,12 @@ export default {
           // 存储用户信息
           const { id, account, avatar, mobile, nicKname, token } = data.result
           store.commit('user/setUser', { id, account, avatar, mobile, nicKname, token })
-          Message({ type: 'success', text: '登录成功' })
-          router.push(route.query.redirectUrl || '/')
+          // 合并购物车操作
+          store.dispatch('cart/mergeLocalCart').then(() => {
+            Message({ type: 'success', text: '登录成功' })
+            router.push(route.query.redirectUrl || '/')
+          })
         } catch (e) {
-          console.log(e)
           Message({ type: 'error', text: e.response.data.message || '登录失败' })
         }
       }
