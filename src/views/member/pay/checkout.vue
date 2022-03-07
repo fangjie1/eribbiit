@@ -11,7 +11,8 @@
         <!-- 收货地址 -->
         <h3 class="box-title">收货地址</h3>
         <div class="box-body">
-          <CheckoutAddress :list="checkoutInfo.userAddresses" />
+          <CheckoutAddress @change="changAddress"
+                           :list="checkoutInfo.userAddresses" />
         </div>
         <!-- 商品信息 -->
         <h3 class="box-title">商品信息</h3>
@@ -107,14 +108,17 @@ export default {
     CheckoutAddress
   },
   setup () {
-    // 结算功能，生成订单
+    // 结算功能，生成订单信息
     const checkoutInfo = ref(null)
     findCheckoutInfo().then(data => {
       checkoutInfo.value = data.result
-      console.log(checkoutInfo.value)
     })
-
-    return { checkoutInfo }
+    // 提交订单：需要收货地址ID
+    const addressId = ref(null)
+    const changAddress = (id) => {
+      addressId.value = id
+    }
+    return { checkoutInfo, changAddress }
   }
 
 }
