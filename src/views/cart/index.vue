@@ -111,7 +111,7 @@
         <div class="batch">
           <XtxCheckbox @change="checkAll"
                        :modelValue="$store.getters['cart/isCheckAll']">全选</XtxCheckbox>
-          <a @click="batchDeleteCart"
+          <a @click="batchDeleteCart(false)"
              href="javascript:;">删除商品</a>
           <a href="javascript:;">移入收藏夹</a>
           <a @click="batchDeleteCart(true)"
@@ -120,7 +120,8 @@
         <div class="total">
           共 {{$store.getters['cart/validTotal']}} 件商品，已选择 {{$store.getters['cart/selectedTotal']}} 件，商品合计：
           <span class="red">¥{{$store.getters['cart/selectedAmount']}}</span>
-          <XtxButton type="primary">下单结算</XtxButton>
+          <XtxButton @click="goCheckout"
+                     type="primary">下单结算</XtxButton>
         </div>
       </div>
       <!-- 猜你喜欢 -->
@@ -131,6 +132,7 @@
 <script>
 import GoodRelevant from '@/views/goods/components/goods-relevant'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import Message from '@/components/lib/Message'
 import Confirm from '@/components/lib/Confirm'
 import CartNone from './components/cart-none.vue'
@@ -175,7 +177,23 @@ export default {
     const updateCartSku = (oldSkuId, newSku) => {
       store.dispatch('cart/updateCartSku', { oldSkuId, newSku })
     }
-    return { checkOne, checkAll, deleteCart, batchDeleteCart, updateCount, updateCartSku }
+    // 跳转结算页面
+    const router = useRouter()
+    const goCheckout = () => {
+      // 1. 判断是否选择有效商品
+      // 2. 判断是否已经登录，未登录 弹窗提示
+      // 3. 进行跳转 （需要做访问权限控制）
+      if (store.getters['cart/selectedList'].length === 0) return Message({ text: '至少选中一件商品才能结算' })
+      if (!store.state.user.profile.token) {
+        Confirm({ text: '下单结算需要登录，您是否去登录？' }).then(() => {
+          // 点击确认
+          router.push('/member/checkout')
+        }).catch(e => { })
+      } else {
+        router.push('/member/checkout')
+      }
+    }
+    return { checkOne, checkAll, deleteCart, batchDeleteCart, updateCount, updateCartSku, goCheckout }
   }
 }
 </script>

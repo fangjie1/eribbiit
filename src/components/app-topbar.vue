@@ -9,7 +9,7 @@
         </template>
         <template v-else>
           <li>
-            <RouterLink :to="`/login?redirectUrl=${$route.path}`">请先登录</RouterLink>
+            <RouterLink :to="$route.path=='/'?'/login':`/login?redirectUrl=${$route.path}`">请先登录</RouterLink>
           </li>
           <li><a href="javascript:;">免费注册</a></li>
         </template>
@@ -36,7 +36,7 @@ export default {
     const router = useRouter()
     const logout = () => {
       store.commit('user/setUser', {})
-      store.commit('cart/setCart', [])
+      store.commit('cart/setCartList', [])
       router.push('/login')
     }
     return { profile, logout }
