@@ -9,6 +9,7 @@ const Login = () => import('@/views/login/index')
 const LoginCallback = () => import('@/views/login/callback')
 const Cart = () => import('@/views/cart/index')
 const PayCheckout = () => import('@/views/member/pay/checkout')
+const PayIndex = () => import('@/views/member/pay/index')
 const routes = [
   // 一级路由布局容器
   {
@@ -38,6 +39,10 @@ const routes = [
       {
         path: '/member/checkout',
         component: PayCheckout
+      },
+      {
+        path: '/member/pay',
+        component: PayIndex
       }
     ]
   },

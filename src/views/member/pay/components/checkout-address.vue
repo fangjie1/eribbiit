@@ -9,14 +9,19 @@
         <li><span>收货地址：</span>{{showAddress.fullLocation.replace(/ /g,'')+showAddress.address}}</li>
       </ul>
       <a v-if="showAddress"
+         @click="openAddressEdit(showAddress)"
          href="javascript:;">修改地址</a>
+      <a v-if="showAddress"
+         @click="DeleteAddressFn(showAddress)"
+         href="javascript:;">删除地址</a>
     </div>
     <div class="action">
       <XtxButton class="btn"
                  @click="openDialog">切换地址</XtxButton>
       <XtxButton class="btn"
-                 @click="openAddressEdit">添加地址</XtxButton>
+                 @click="openAddressEdit({})">添加地址</XtxButton>
     </div>
+    <!-- 切换收货地址组件 -->
     <XtxDialog title="切换收货地址"
                v-model:visible="visibleDialog">
       <div @click="selectedAddress=item"
@@ -38,12 +43,17 @@
                    type="primary">确认</XtxButton>
       </template>
     </XtxDialog>
-    <AddressEdit ref="AddressEditCom" />
+    <!--  收货地址添加编辑组件-->
+    <AddressEdit @on-success="successHandler"
+                 ref="AddressEditCom" />
   </div>
 </template>
 <script>
 import { ref } from 'vue'
 import AddressEdit from './address-edit.vue'
+import { DeleteAddress } from '@/api/order'
+import Message from '@/components/lib/Message'
+import Confirm from '@/components/lib/Confirm'
 export default {
   name: 'CheckoutAddress',
   components: { AddressEdit },
@@ -78,18 +88,59 @@ export default {
       // 显示的地址换成选中的地址，并且把地址ID通知父组件
       visibleDialog.value = false
       showAddress.value = selectedAddress.value
+      console.log(selectedAddress.value.id)
       emit('change', selectedAddress.value?.id)
     }
+
     const openDialog = () => {
       selectedAddress.value = null
       visibleDialog.value = true
     }
+
     // 打开添加编辑收货地址组件
     const AddressEditCom = ref(null)
-    const openAddressEdit = () => {
-      AddressEditCom.value.open()
+    const openAddressEdit = (address) => {
+      // 添加为 {}，修改为传对象
+      AddressEditCom.value.open(address)
     }
-    return { showAddress, visibleDialog, selectedAddress, confirmAddressFn, openDialog, AddressEditCom, openAddressEdit }
+    // 编辑或添加收货地址
+    const successHandler = (formData) => {
+      const editAddress = props.list.find(item => item.id === formData.id)
+      if (editAddress) {
+        for (const key in editAddress) {
+          editAddress[key] = formData[key]
+        }
+      } else {
+        const jsonStr = JSON.parse(JSON.stringify(formData))
+        // eslint-disable-next-line vue/no-mutating-props
+        props.list.unshift(jsonStr)
+      }
+    }
+
+    // 删除收货地址
+    const DeleteAddressFn = (address) => {
+      // eslint-disable-next-line vue/no-mutating-props
+      Confirm({ text: '确认要删除该收货地址吗' }).then(() => {
+        const index = props.list.findIndex(item => item.id === address.id)
+        DeleteAddress(address).then(() => {
+          // eslint-disable-next-line vue/no-mutating-props
+          props.list.splice(index, 1)
+          showAddress.value = props.list[index - 1 < 0 ? 0 : index - 1]
+          Message({ type: 'success', text: '删除成功' })
+        })
+      }).catch(e => { })
+    }
+    return {
+      showAddress,
+      visibleDialog,
+      selectedAddress,
+      confirmAddressFn,
+      openDialog,
+      AddressEditCom,
+      openAddressEdit,
+      successHandler,
+      DeleteAddressFn
+    }
   }
 }
 </script>

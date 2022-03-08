@@ -5,7 +5,7 @@
          @click="toggleDialog"
          :class="{active:visible}">
       <span class="placeholder"
-            v-if="!fullLocation">请选择配送地址</span>
+            v-if="!fullLocation">{{placeholder}}</span>
       <span class="value"
             v-else>{{fullLocation}}</span>
       <i class="iconfont icon-angle-down"></i>
@@ -32,6 +32,10 @@ export default {
     fullLocation: {
       type: String,
       default: ''
+    },
+    placeholder: {
+      type: String,
+      default: '请选择配送地址'
     }
   },
   setup (props, { emit }) {
@@ -49,17 +53,19 @@ export default {
         changeResult[key] = ''
       }
     }
+    // 关闭弹层
     const close = () => {
       visible.value = false
     }
+    // 显示隐藏弹层
     const toggleDialog = () => {
       visible.value ? close() : open()
     }
+    // 点击组件外隐藏
     const target = ref(null)
     onClickOutside(target, () => {
       close()
     })
-
     const allCityData = ref([])
     const loading = ref(false)
     // 获取城市数据功能
