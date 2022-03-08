@@ -44,5 +44,5 @@ export const createOrder = (order) => {
  * @param {String} id - 订单ID
  */
 export const findOrder = (id) => {
-  return request('/member/order/' + id, 'get')
+  return request(`/member/order/${id}`, 'get')
 }
