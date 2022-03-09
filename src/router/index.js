@@ -13,6 +13,8 @@ const PayIndex = () => import('@/views/member/pay/index')
 const PayResult = () => import('@/views/member/pay/result.vue')
 const MemberLayout = () => import('@/views/member/Layout')
 const MemberHome = () => import('@/views/member/home')
+const MemberOrder = () => import('@/views/member/order')
+const MemberDetail = () => import('@/views/member/order/detail')
 const routes = [
   // 一级路由布局容器
   {
@@ -58,6 +60,14 @@ const routes = [
           {
             path: '/member',
             component: MemberHome
+          },
+          {
+            path: '/member/order',
+            component: MemberOrder
+          },
+          {
+            path: '/member/order/:id',
+            component: MemberDetail
           }
         ]
       }
