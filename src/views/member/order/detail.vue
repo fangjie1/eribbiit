@@ -1,6 +1,8 @@
 <template>
   <div class="member-order">
+    <XtxTabs>
 
+    </XtxTabs>
   </div>
 </template>
 
