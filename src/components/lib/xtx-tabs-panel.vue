@@ -1,5 +1,4 @@
 <template>
-  <!-- 装载是内容 -->
   <div class="xtx-tabs-panel"
        v-show="activeName===name">
     <slot />
