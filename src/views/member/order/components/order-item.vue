@@ -10,7 +10,8 @@
         <b>付款截止：{{timeText}}</b>
       </span>
       <!-- 已完成 已取消 -->
-      <a v-if="[5,6].includes(order.orderState)"
+      <a @click="$emit('on-delete',order)"
+         v-if="[5,6].includes(order.orderState)"
          href="javascript:;"
          class="del">删除</a>
     </div>
@@ -38,7 +39,8 @@
         <!-- 待收货：查看物流 -->
         <!-- 待评价：评价商品 -->
         <!-- 已完成：查看评价 -->
-        <p v-if="order.orderState===3"><a href="javascript:;"
+        <p @click="$emit('on-logistics',order)"
+           v-if="order.orderState===3"><a href="javascript:;"
              class="green">查看物流</a></p>
         <p v-if="order.orderState===4"><a href="javascript:;"
              class="green">评价商品</a></p>
@@ -57,15 +59,18 @@
         <!-- 待评价：查看详情，再次购买，申请售后 -->
         <!-- 已完成：查看详情，再次购买，申请售后 -->
         <!-- 已取消：查看详情 -->
-        <XtxButton @click="$router(`/member/pay?orderId=${order.id}`)"
+        <XtxButton @click="$router.push(`/member/pay?orderId=${order.id}`)"
                    v-if="order.orderState===1"
                    type="primary"
                    size="small">立即付款</XtxButton>
-        <XtxButton v-if="order.orderState===3"
+        <XtxButton @click="$emit('on-confirm',order)"
+                   v-if="order.orderState===3"
                    type="primary"
                    size="small">确认收货</XtxButton>
-        <p><a href="javascript:;">查看详情</a></p>
-        <p v-if="order.orderState===1"><a href="javascript:;">取消订单</a></p>
+        <p><a @click="$router.push(`/member/order/${order.id}`)"
+             href="javascript:;">查看详情</a></p>
+        <p @click="$emit('on-cancel')"
+           v-if="order.orderState===1"><a href="javascript:;">取消订单</a></p>
         <p v-if="[2,3,4,5].includes(order.orderState)"><a href="javascript:;">再次购买</a></p>
         <p v-if="[4,5].includes(order.orderState)"><a href="javascript:;">申请售后</a></p>
       </div>
@@ -83,6 +88,7 @@ export default {
       default: () => ({})
     }
   },
+  emits: ['on-cancel', 'on-delete', 'on-confirm', 'on-logistics'],
   setup (props) {
     const { start, timeText } = usePayTime()
     start(props.order.countdown)

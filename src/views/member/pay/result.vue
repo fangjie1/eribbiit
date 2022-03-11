@@ -43,7 +43,6 @@ export default {
     findOrder(route.query.orderId).then(data => {
       console.log(1)
       order.value = data.result
-      console.log(order.value)
     }).catch(e => {
 
     })
