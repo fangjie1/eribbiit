@@ -2,25 +2,88 @@
   <div class="detail-action">
     <div class="state">
       <span class="iconfont icon-order-unpay"></span>
-      <p>待支付</p>
+      <p>{{orderStatus[order.orderState].label}}</p>
     </div>
     <div class="info">
-      <p>订单编号：1372361846887026690</p>
-      <p>下单时间：2021-03-18 01:45:10</p>
+      <p>订单编号：{{order.id}}</p>
+      <p>下单时间：{{order.createTime}}</p>
     </div>
+    <!-- 待付款：立即付款，取消订单
+        待发货：再次购买
+        待收货：确认收货，再次购买
+        待评价：评价商品，再次购买，申请售后
+        已完成：查看评价，再次购买，申请售后
+        已取消： -->
     <div class="btn">
-      <XtxButton type="primary"
-                 size="small">评价商品</XtxButton>
-      <XtxButton type="plain"
-                 size="small">再次购买</XtxButton>
-      <XtxButton type="gray"
-                 size="small">申请售后</XtxButton>
+      <!-- 待付款 -->
+      <template v-if="order.orderState === 1">
+        <XtxButton @click="$router.push(`/member/checkout?orderId=${order.id}`)"
+                   type="primary"
+                   size="small">立即付款</XtxButton>
+        <XtxButton @click="onCancelOrder(order)"
+                   type="gray"
+                   size="small">取消订单</XtxButton>
+      </template>
+      <!-- 待发货 -->
+      <template v-if="order.orderState === 2">
+        <XtxButton @click="$router.push(`/member/checkout?orderId=${order.id}`)"
+                   \type="primary"
+                   size="small">再次购买</XtxButton>
+      </template>
+      <!-- 待收货 -->
+      <template v-if="order.orderState === 3">
+        <XtxButton @click="onConfirm(order)"
+                   type="primary"
+                   size="small">确认收货</XtxButton>
+        <XtxButton @click="$router.push(`/member/checkout?orderId=${order.id}`)"
+                   type="plain"
+                   size="small">再次购买</XtxButton>
+      </template>
+      <!-- 待评价 -->
+      <template v-if="order.orderState === 4">
+        <XtxButton @click="$router.push(`/member/checkout?orderId=${order.id}`)"
+                   type="primary"
+                   size="small">再次购买</XtxButton>
+        <XtxButton type="plain"
+                   size="small">评价商品</XtxButton>
+        <XtxButton type="gray"
+                   size="small">申请售后</XtxButton>
+      </template>
+      <!-- 已完成 -->
+      <template v-if="order.orderState === 5">
+        <XtxButton @click="$router.push(`/member/checkout?orderId=${order.id}`)"
+                   type="primary"
+                   size="small">再次购买</XtxButton>
+        <XtxButton type="plain"
+                   size="small">查看评价</XtxButton>
+        <XtxButton type="gray"
+                   size="small">申请售后</XtxButton>
+      </template>
+      <!-- 已取消 -->
     </div>
+    <teleport to='#model'>
+      <OrderCancel ref="orderCancelCom" />
+    </teleport>
   </div>
 </template>
 <script>
+import { orderStatus } from '@/api/constants'
+import OrderCancel from './order-cancel.vue'
+import { useCancelOrder, useConfirmOrder } from '../index.vue'
 export default {
-  name: 'OrderDetailAction'
+  name: 'OrderDetailAction',
+  components: {
+    OrderCancel
+  },
+  props: {
+    order: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  setup () {
+    return { orderStatus, ...useCancelOrder(), ...useConfirmOrder() }
+  }
 }
 </script>
 <style scoped lang="less">

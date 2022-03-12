@@ -36,7 +36,7 @@ import { ref, reactive, watch } from 'vue'
 import { orderStatus } from '@/api/constants'
 import OrderItem from './components/order-item.vue'
 import { findOrderList, deleteOrder, confirmOrder } from '@/api/order'
-import OrderCancel from './components/order-cancel.vue'
+import OrderCancel from './components/order-cancel'
 import Confirm from '@/components/lib/Confirm'
 import Message from '@/components/lib/Message'
 import OrderLogistics from './components/order-logistics'
@@ -102,7 +102,7 @@ export default {
   }
 }
 // 封装逻辑-取消订单
-const useCancelOrder = () => {
+export const useCancelOrder = () => {
   const orderCancelCom = ref(null)
   const onCancelOrder = (item) => {
     orderCancelCom.value.open(item)
@@ -110,7 +110,7 @@ const useCancelOrder = () => {
   return { onCancelOrder, orderCancelCom }
 }
 // 封装逻辑-确认收货
-const useConfirmOrder = () => {
+export const useConfirmOrder = () => {
   const onConfirm = (item) => {
     // item 就是你要确认收货的订单
     Confirm({ text: '您确认收到货吗？确认后货款将会打给卖家。' }).then(() => {
@@ -124,7 +124,7 @@ const useConfirmOrder = () => {
   return { onConfirm }
 }
 // 封装逻辑-查看物流
-const useLogisticsOrder = () => {
+export const useLogisticsOrder = () => {
   const logisticsOrderCom = ref(null)
   const onLogisticsOrder = (item) => {
     logisticsOrderCom.value.open(item)

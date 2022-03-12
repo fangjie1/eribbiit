@@ -8,6 +8,15 @@ export const findCheckoutInfo = () => {
 }
 
 /**
+ * 获取再次购买的订单结算信息
+ * @param {String} id - 订单ID
+ * @returns
+ */
+export const findOrderRepurchase = (id) => {
+  return request(`/member/order/repurchase/${id}`, 'get')
+}
+
+/**
  * 添加收货地址信息
  * @param {Object} address - 地址对象
  */

@@ -101,10 +101,10 @@
 </template>
 <script>
 import CheckoutAddress from './components/checkout-address'
-import { findCheckoutInfo, createOrder } from '@/api/order.js'
+import { findCheckoutInfo, createOrder, findOrderRepurchase } from '@/api/order.js'
 import { ref, reactive } from 'vue'
 import Message from '@/components/lib/Message'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 export default {
   name: 'XtxPayCheckoutPage',
   components: {
@@ -113,16 +113,32 @@ export default {
   setup () {
     // 结算功能，生成订单信息
     const checkoutInfo = ref(null)
-    findCheckoutInfo().then(data => {
-      checkoutInfo.value = data.result
-      // 设置提交时候的商品
-      requestParams.goods = checkoutInfo.value.goods.map(item => {
-        return {
-          skuId: item.skuId,
-          count: item.count
-        }
+    const route = useRoute()
+    if (route.query.orderId) {
+      // 按订单中的商品结算
+      findOrderRepurchase(route.query.orderId).then(data => {
+        checkoutInfo.value = data.result
+        // 设置提交时候的商品
+        requestParams.goods = checkoutInfo.value.goods.map(item => {
+          return {
+            skuId: item.skuId,
+            count: item.count
+          }
+        })
       })
-    })
+    } else {
+      // 按购车车中的商品结算
+      findCheckoutInfo().then(data => {
+        checkoutInfo.value = data.result
+        // 设置提交时候的商品
+        requestParams.goods = checkoutInfo.value.goods.map(item => {
+          return {
+            skuId: item.skuId,
+            count: item.count
+          }
+        })
+      })
+    }
     // 需要提交的字段
     const requestParams = reactive({
       addressId: null,

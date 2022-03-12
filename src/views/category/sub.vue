@@ -1,5 +1,5 @@
 <template>
-  <diva class='sub-category'>
+  <div class='sub-category'>
     <div class="container">
       <!-- 面包屑 -->
       <SubBread />
@@ -22,7 +22,7 @@
                             @infinite="getData" />
       </div>
     </div>
-  </diva>
+  </div>
 </template>
 
 <script>
